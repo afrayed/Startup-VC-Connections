@@ -1,0 +1,60 @@
+# install.packages("stringdist")
+require(stringdist)
+library(stringdist)
+
+# loading the names
+principals = read.csv("H:/Ethnicity/principals.csv")
+principals$surname = toupper(principals$surname)
+principals_list = subset(principals, select = c(6))
+n_principals_list = nrow(principals_list)
+
+wikisurname = read.csv("H:/Ethnicity/wikipediasurnames.csv")
+wikisurname$surname = toupper(wikisurname$Last_Name)
+
+wikimatch = vector(length = n_principals_list)
+
+progressbar = txtProgressBar(min = 0, max = n_principals_list, style = 3)
+for(i in 1:n_principals_list){
+  wikimatch[i] = amatch(principals_list[i, ], wikisurname$Last_Name, nomatch = -999, matchNA = F, method = c("lv"))
+  Sys.sleep(0.1)
+  # update progress bar
+  setTxtProgressBar(progressbar, i)
+}
+close(progressbar)
+
+oxfordsurname = read.csv("H:/Ethnicity/namedictionary.csv")
+oxfordsurname$Last_Name = toupper(oxfordsurname$Last_Name)
+
+oxfordmatch = vector(length = n_principals_list)
+
+progressbar = txtProgressBar(min = 0, max = n_principals_list, style = 3)
+for(i in 1:n_principals_list){
+  oxfordmatch[i] = amatch(principals_list[i, ], oxfordsurname$Last_Name, nomatch = -999, matchNA = F, method = c("lv"))
+  Sys.sleep(0.1)
+  # update progress bar
+  setTxtProgressBar(progressbar, i)
+}
+close(progressbar)
+
+
+combinednames = read.csv("H:/Ethnicity/combinednames.csv")
+combinednames$Last_Name = toupper(combinednames$Last_Name)
+
+combinedmatch = vector(length = n_principals_list)
+
+progressbar = txtProgressBar(min = 0, max = n_principals_list, style = 3)
+for(i in 1:n_principals_list){
+  combinedmatch[i] = amatch(principals_list[i, ], combinednames$Last_Name, nomatch = -999, matchNA = F, method = c("lv"))
+  Sys.sleep(0.1)
+  # update progress bar
+  setTxtProgressBar(progressbar, i)
+}
+close(progressbar)
+
+write.csv(principals, "H:/Ethnicity/principals_list.csv")
+write.csv(oxfordmatch, "H:/Ethnicity/oxfordmatch.csv")
+write.csv(wikimatch, "H:/Ethnicity/wikimatch.csv")
+write.csv(combinedmatch, "H:/Ethnicity/combinedmatch.csv")
+write.csv(oxfordsurname, "H:/Ethnicity/oxfordsurname.csv")
+write.csv(wikisurname, "H:/Ethnicity/wikisurname.csv")
+write.csv(combinednames, "H:/Ethnicity/combinedsurnames.csv")
